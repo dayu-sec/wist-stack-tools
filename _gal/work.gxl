@@ -1,0 +1,39 @@
+extern mod rust,ver { path = "@{PATH}"; }
+
+mod envs {
+   env _common : rust_env.init {
+    root      = ".";
+    prj_key   = "wist-stack-tools";
+  }
+
+  #[usage(desp="use debug ",color="blue")]
+  env debug : _common,rust_env.debug {
+  }
+  #[usage(desp="use release ",color="blue")]
+  env release : _common,rust_env.release {
+  }
+
+  #[usage(desp="default", color="green")]
+  env default : envs._common,debug;
+}
+
+mod main {
+  #[auto_load(entry)]
+  flow __into | conf {
+  }
+  flow conf {
+  }
+
+  #[task(name="${ENV_PRJ_KEY}@build")]
+  flow build | ver.use | conf | rust_flow.build {
+  }
+
+  #[usage(desp="test workspace")]
+  flow test | conf {
+    gx.cmd ( "cargo test --workspace ${ENV_BUILD_FLAG}", log : "1", out : "true" );
+  }
+
+  #[usage(desp="lint code")]
+  flow lint | rust_flow.lint {
+  }
+}
