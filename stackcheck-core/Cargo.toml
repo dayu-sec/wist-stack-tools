@@ -5,7 +5,12 @@ edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
 description = "Shared engine for wist stack-level config checks: Flow Result v1, CLI, profiles, compose/ports/x509 helpers."
-publish = false
+repository = "https://github.com/dayu-sec/wist-stack-tools"
+homepage = "https://github.com/dayu-sec/wist-stack-tools"
+documentation = "https://docs.rs/wist-stackcheck-core"
+readme = "README.md"
+keywords = ["stack", "configuration", "diagnostics", "wist"]
+categories = ["command-line-utilities", "development-tools"]
 
 [dependencies]
 serde_json = "1"

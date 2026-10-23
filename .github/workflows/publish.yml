@@ -1,0 +1,52 @@
+name: Publish
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: crates-io-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish stackcheck-core to crates.io
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Check tag matches crate version
+        if: github.event_name == 'push'
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -eu
+          version="$(python3 -c 'import tomllib; print(tomllib.load(open("stackcheck-core/Cargo.toml","rb"))["package"]["version"])')"
+          tag="${TAG#v}"
+          [ "${version}" = "${tag}" ] || {
+            echo "::error::tag v${tag} != stackcheck-core version ${version}"
+            exit 1
+          }
+          echo "publishing wist-stackcheck-core ${version}"
+
+      - name: Test workspace
+        run: cargo test --workspace
+
+      - name: Package (dry run)
+        run: cargo publish -p wist-stackcheck-core --dry-run
+
+      - name: Publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          set -eu
+          [ -n "${CARGO_REGISTRY_TOKEN}" ] || {
+            echo "::error::缺少仓库 Secret CARGO_REGISTRY_TOKEN（crates.io API token）"
+            exit 1
+          }
+          cargo publish -p wist-stackcheck-core --token "${CARGO_REGISTRY_TOKEN}"
