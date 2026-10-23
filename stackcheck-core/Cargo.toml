@@ -1,6 +1,6 @@
 [package]
 name = "wist-stackcheck-core"
-version = "0.1.1" #@gxl:set(version)
+version = "0.1.2" #@gxl:set(version)
 edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
