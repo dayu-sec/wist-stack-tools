@@ -35,10 +35,10 @@ git tag vX.Y.Z-dryrun && git push origin vX.Y.Z-dryrun   # 可选：先 dry-run
 git tag vX.Y.Z && git push origin vX.Y.Z                 # 真发
 ```
 
-发布后，两个栈把依赖从 git tag 切成 registry 版本：
+两个栈已切到 registry 版本：
 
 ```toml
 wist-stackcheck-core = "0.1"
 ```
 
-然后 `cargo update -p wist-stackcheck-core` 并提交 `Cargo.lock`。
+以后升 core：改 `Cargo.toml` 的版本约束，跑 `cargo update -p wist-stackcheck-core`，提交 `Cargo.lock`。
