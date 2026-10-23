@@ -15,6 +15,16 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v7
+      - name: Check CRATES_IO_TOKEN
+        if: ${{ !endsWith(github.ref, '-dryrun') }}
+        env:
+          TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+        run: |
+          set -eu
+          if [ -z "${TOKEN}" ]; then
+            echo "::error::CRATES_IO_TOKEN 未注入：确认组织级 Secret 已授权给 dayu-sec/wist-stack-tools（Repository access），或在本仓添加同名 Secret"
+            exit 1
+          fi
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:

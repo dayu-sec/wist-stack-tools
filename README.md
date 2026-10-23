@@ -21,8 +21,11 @@ crate：**`wist-stackcheck-core`**（[crates.io](https://crates.io/crates/wist-s
 - 发布流程参考 `wist/wist-contracts`：`.github/workflows/release.yml`
   - 推 `vX.Y.Z` 标签 → 创建 GitHub Release + `cargo publish`；
   - 推 `vX.Y.Z-dryrun` 标签 → 只跑 `cargo publish --dry-run`（不真发）。
-- 仓库 Secret：**`CRATES_IO_TOKEN`**（crates.io API token，需 `publish-new` /
+- 仓库/组织 Secret：**`CRATES_IO_TOKEN`**（crates.io API token，需 `publish-new` /
   `publish-update` 权限）。
+  - 推荐用 **dayu-sec 组织级 Secret**；组织 Secrets 需在 Repository access 里包含
+    `wist-stack-tools`（或选 All repositories）。
+  - 工作流在创建 Release **之前**检查令牌是否注入；没授权会直接失败，不会留下空 Release。
 
 ```bash
 gx adm v_feat                    # 升 version.txt + Cargo.toml

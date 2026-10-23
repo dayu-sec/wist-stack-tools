@@ -33,7 +33,7 @@ wist-stackcheck-core = "0.1"
 - 版本以仓库根 `version.txt` 为权威；`Cargo.toml` 的版本行带 `#@gxl:set(version)`。
 - 发布由 `.github/workflows/release.yml` 执行：推 `vX.Y.Z` 标签发布；`vX.Y.Z-dryrun`
   只做 `cargo publish --dry-run`。
-- 仓库 Secret：`CRATES_IO_TOKEN`（crates.io API token）。
+- Secret：组织级或仓库级 `CRATES_IO_TOKEN`（组织级需授权给本仓）。
 
 ## License
 
