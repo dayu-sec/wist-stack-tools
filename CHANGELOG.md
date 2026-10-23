@@ -6,6 +6,15 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-10-23
+
+### Changed
+
+- **Human-readable summary omits zero segments**: `23 项检查：20 ok / 3 warn（结论：warn）`
+  instead of always printing `… / 0 warn / 0 fail`. The `0 fail` segment is highlighted red by
+  log viewers / CI keyword coloring, which reads as if something failed. The total is still at
+  the front, so nothing is lost.
+
 ## [0.1.3] - 2026-10-23
 
 ### Documentation

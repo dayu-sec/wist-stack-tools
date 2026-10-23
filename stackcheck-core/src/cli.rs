@@ -251,10 +251,33 @@ pub fn print_text(findings: &[Finding], verdict: Status) {
     let warns = findings.iter().filter(|f| f.status == Status::Warn).count();
     let oks = total - fails - warns;
     println!();
-    println!(
-        "{total} 项检查：{oks} ok / {warns} warn / {fails} fail（结论：{}）",
-        verdict.as_str()
-    );
+    println!("{}", summary_line(oks, warns, fails, total, verdict));
+}
+
+/// 汇总行：**为 0 的段不打印**。
+///
+/// `0 fail` 这种段在日志查看器 / CI 高亮里会按关键词被涂成红色，读起来像“有失败”；
+/// 总数已经在句首，省掉零段既不丢信息，也不会睛眼。
+fn summary_line(oks: usize, warns: usize, fails: usize, total: usize, verdict: Status) -> String {
+    let mut parts = Vec::new();
+    if oks > 0 {
+        parts.push(format!("{oks} ok"));
+    }
+    if warns > 0 {
+        parts.push(format!("{warns} warn"));
+    }
+    if fails > 0 {
+        parts.push(format!("{fails} fail"));
+    }
+    if parts.is_empty() {
+        format!("{total} 项检查（结论：{}）", verdict.as_str())
+    } else {
+        format!(
+            "{total} 项检查：{}（结论：{}）",
+            parts.join(" / "),
+            verdict.as_str()
+        )
+    }
 }
 
 #[cfg(test)]
@@ -296,6 +319,28 @@ mod tests {
     #[test]
     fn rejects_empty_only() {
         assert!(parse(&["--only", " "]).is_err());
+    }
+
+    #[test]
+    fn summary_omits_zero_segments() {
+        // 全好：不出现 warn / fail
+        let ok = summary_line(3, 0, 0, 3, Status::Ok);
+        assert_eq!(ok, "3 项检查：3 ok（结论：ok）");
+        assert!(!ok.contains("fail"), "{ok}");
+
+        // 有 warn 无 fail：不出现 "0 fail"（日志高亮会把它涂红）
+        let warn = summary_line(20, 3, 0, 23, Status::Warn);
+        assert_eq!(warn, "23 项检查：20 ok / 3 warn（结论：warn）");
+        assert!(!warn.contains("fail"), "{warn}");
+
+        // 有 fail：该段必须在
+        let fail = summary_line(1, 0, 2, 3, Status::Fail);
+        assert_eq!(fail, "3 项检查：1 ok / 2 fail（结论：fail）");
+        assert!(!fail.contains("warn"), "{fail}");
+
+        // 一项都没跑：不出现空的 “：” 列表
+        let none = summary_line(0, 0, 0, 0, Status::Ok);
+        assert_eq!(none, "0 项检查（结论：ok）");
     }
 
     #[test]
